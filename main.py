@@ -4,6 +4,7 @@ Created on Mon Oct 27 12:30:00 2025
 
 @author: sksou
 """
+
 import numpy as np
 import pickle
 import streamlit as st
@@ -16,7 +17,7 @@ st.markdown(
     """
     <style>
     .block-container {
-        max-width: 100% !important;
+        max-width: 90% !important;
         padding-left: 2rem;
         padding-right: 2rem;
     }
@@ -47,7 +48,7 @@ def main():
 
     # Column 1 - Personal info
     with col1:
-        gender = st.selectbox("Gender", ["Female", "Male"], index=None)
+        gender = st.selectbox("Gender", ["Female", "Male"], index=None, placeholder="Choose Gender")
         SeniorCitizen = st.selectbox("Senior Citizen", [0, 1], index=None, placeholder="Choose Option")
         Partner = st.selectbox("Partner", ["Yes", "No"], index=None, placeholder="Choose Partner Status")
         Dependents = st.selectbox("Dependents", ["Yes", "No"], index=None, placeholder="Choose Dependents")
@@ -85,7 +86,6 @@ def main():
     diagnosis = ""
 
     if st.button("🔍 Predict Churn"):
-        # Validate all dropdowns
         dropdowns = [
             gender, SeniorCitizen, Partner, Dependents, PhoneService, MultipleLines,
             InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport,
@@ -96,23 +96,52 @@ def main():
             st.error("⚠️ Please select a value for all dropdowns before prediction.")
         else:
             try:
+                # === Encoding mappings (must match training encoders) ===
+                gender_map = {"Female": 0, "Male": 1}
+                partner_map = {"No": 0, "Yes": 1}
+                dependents_map = {"No": 0, "Yes": 1}
+                phone_map = {"No": 0, "Yes": 1}
+                multiple_map = {"No phone service": 0, "No": 1, "Yes": 2}
+                internet_map = {"No": 0, "DSL": 1, "Fiber optic": 2}
+                service_map = {"No": 0, "Yes": 1, "No internet service": 2}
+                contract_map = {"Month-to-month": 0, "One year": 1, "Two year": 2}
+                paperless_map = {"No": 0, "Yes": 1}
+                payment_map = {
+                    "Electronic check": 0,
+                    "Mailed check": 1,
+                    "Bank transfer (automatic)": 2,
+                    "Credit card (automatic)": 3
+                }
+
+                # Apply encoding
                 input_data = [
-                    gender, SeniorCitizen, Partner, Dependents, tenure,
-                    PhoneService, MultipleLines, InternetService, OnlineSecurity,
-                    OnlineBackup, DeviceProtection, TechSupport, StreamingTV,
-                    StreamingMovies, Contract, PaperlessBilling, PaymentMethod,
-                    MonthlyCharges, TotalCharges
+                    gender_map[gender],
+                    int(SeniorCitizen),
+                    partner_map[Partner],
+                    dependents_map[Dependents],
+                    tenure,
+                    phone_map[PhoneService],
+                    multiple_map[MultipleLines],
+                    internet_map[InternetService],
+                    service_map[OnlineSecurity],
+                    service_map[OnlineBackup],
+                    service_map[DeviceProtection],
+                    service_map[TechSupport],
+                    service_map[StreamingTV],
+                    service_map[StreamingMovies],
+                    contract_map[Contract],
+                    paperless_map[PaperlessBilling],
+                    payment_map[PaymentMethod],
+                    MonthlyCharges,
+                    TotalCharges
                 ]
+
                 diagnosis = churn_prediction(input_data)
                 st.success(diagnosis)
+
             except Exception as e:
                 st.error(f"Error in prediction: {e}")
 
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
