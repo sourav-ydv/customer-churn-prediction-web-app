@@ -4,8 +4,6 @@ Created on Mon Oct 27 12:30:00 2025
 
 @author: sksou
 """
-
-
 import numpy as np
 import pickle
 import streamlit as st
@@ -49,34 +47,36 @@ def main():
 
     # Column 1 - Personal info
     with col1:
-        gender = st.selectbox("Gender", [" " , "Female", "Male"])
-        SeniorCitizen = st.selectbox("Senior Citizen", ["Select...", 0, 1])
-        Partner = st.selectbox("Partner", ["Select...", "Yes", "No"])
-        Dependents = st.selectbox("Dependents", ["Select...", "Yes", "No"])
+        gender = st.selectbox("Gender", ["Female", "Male"], index=None, placeholder="Choose Gender")
+        SeniorCitizen = st.selectbox("Senior Citizen", [0, 1], index=None, placeholder="Choose Option")
+        Partner = st.selectbox("Partner", ["Yes", "No"], index=None, placeholder="Choose Partner Status")
+        Dependents = st.selectbox("Dependents", ["Yes", "No"], index=None, placeholder="Choose Dependents")
         tenure = st.number_input("Tenure (in months)", min_value=0, max_value=100, step=1)
 
     # Column 2 - Phone & Internet
     with col2:
-        PhoneService = st.selectbox("Phone Service", ["Select...", "Yes", "No"])
-        MultipleLines = st.selectbox("Multiple Lines", ["Select...", "No phone service", "No", "Yes"])
-        InternetService = st.selectbox("Internet Service", ["Select...", "DSL", "Fiber optic", "No"])
-        OnlineSecurity = st.selectbox("Online Security", ["Select...", "No", "Yes", "No internet service"])
-        OnlineBackup = st.selectbox("Online Backup", ["Select...", "No", "Yes", "No internet service"])
+        PhoneService = st.selectbox("Phone Service", ["Yes", "No"], index=None, placeholder="Choose Phone Service")
+        MultipleLines = st.selectbox("Multiple Lines", ["No phone service", "No", "Yes"], index=None, placeholder="Choose Option")
+        InternetService = st.selectbox("Internet Service", ["DSL", "Fiber optic", "No"], index=None, placeholder="Choose Internet Service")
+        OnlineSecurity = st.selectbox("Online Security", ["No", "Yes", "No internet service"], index=None, placeholder="Choose Option")
+        OnlineBackup = st.selectbox("Online Backup", ["No", "Yes", "No internet service"], index=None, placeholder="Choose Option")
 
     # Column 3 - Services
     with col3:
-        DeviceProtection = st.selectbox("Device Protection", ["Select...", "No", "Yes", "No internet service"])
-        TechSupport = st.selectbox("Tech Support", ["Select...", "No", "Yes", "No internet service"])
-        StreamingTV = st.selectbox("Streaming TV", ["Select...", "No", "Yes", "No internet service"])
-        StreamingMovies = st.selectbox("Streaming Movies", ["Select...", "No", "Yes", "No internet service"])
-        Contract = st.selectbox("Contract", ["Select...", "Month-to-month", "One year", "Two year"])
+        DeviceProtection = st.selectbox("Device Protection", ["No", "Yes", "No internet service"], index=None, placeholder="Choose Option")
+        TechSupport = st.selectbox("Tech Support", ["No", "Yes", "No internet service"], index=None, placeholder="Choose Option")
+        StreamingTV = st.selectbox("Streaming TV", ["No", "Yes", "No internet service"], index=None, placeholder="Choose Option")
+        StreamingMovies = st.selectbox("Streaming Movies", ["No", "Yes", "No internet service"], index=None, placeholder="Choose Option")
+        Contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"], index=None, placeholder="Choose Contract")
 
     # Column 4 - Billing
     with col4:
-        PaperlessBilling = st.selectbox("Paperless Billing", ["Select...", "Yes", "No"])
+        PaperlessBilling = st.selectbox("Paperless Billing", ["Yes", "No"], index=None, placeholder="Choose Option")
         PaymentMethod = st.selectbox(
             "Payment Method",
-            ["Select...", "Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"]
+            ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"],
+            index=None,
+            placeholder="Choose Payment Method"
         )
         MonthlyCharges = st.number_input("Monthly Charges", min_value=0.0, step=0.1)
         TotalCharges = st.number_input("Total Charges", min_value=0.0, step=0.1)
@@ -85,15 +85,15 @@ def main():
     diagnosis = ""
 
     if st.button("🔍 Predict Churn"):
-        # Collect all dropdowns to check for unselected fields
+        # Validate all dropdowns
         dropdowns = [
             gender, SeniorCitizen, Partner, Dependents, PhoneService, MultipleLines,
             InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport,
             StreamingTV, StreamingMovies, Contract, PaperlessBilling, PaymentMethod
         ]
 
-        if "Select..." in dropdowns:
-            st.error("⚠️ Please select a value for all fields before prediction.")
+        if any(option is None for option in dropdowns):
+            st.error("⚠️ Please select a value for all dropdowns before prediction.")
         else:
             try:
                 input_data = [
@@ -111,9 +111,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
 
 
 
