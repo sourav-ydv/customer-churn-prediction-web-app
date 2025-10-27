@@ -22,6 +22,23 @@ def churn_prediction(input_data):
     else:
         return "⚠️ The customer is likely to Churn."
 
+# Set wide layout and expand full screen width
+st.set_page_config(layout="wide")
+
+# Optional: Custom CSS to remove max-width and stretch content
+st.markdown(
+    """
+    <style>
+    .block-container {
+        max-width: 100% !important;
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 st.title("📊 Customer Churn Prediction Web App")
 
@@ -81,6 +98,7 @@ if st.button("🔍 Predict Churn"):
         st.error(f"Error in prediction: {e}")
 
 st.success(diagnosis)
+
 
 
 
