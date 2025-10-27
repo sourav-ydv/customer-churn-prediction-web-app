@@ -47,7 +47,7 @@ def main():
 
     # Column 1 - Personal info
     with col1:
-        gender = st.selectbox("Gender", ["Female", "Male"], index=None, placeholder="Choose Gender")
+        gender = st.selectbox("Gender", ["Female", "Male"], index=None)
         SeniorCitizen = st.selectbox("Senior Citizen", [0, 1], index=None, placeholder="Choose Option")
         Partner = st.selectbox("Partner", ["Yes", "No"], index=None, placeholder="Choose Partner Status")
         Dependents = st.selectbox("Dependents", ["Yes", "No"], index=None, placeholder="Choose Dependents")
@@ -111,6 +111,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
