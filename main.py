@@ -4,6 +4,10 @@ Created on Mon Oct 27 12:30:00 2025
 
 @author: sksou
 """
+# -*- coding: utf-8 -*-
+"""
+Customer Churn Prediction Web App with Spaced Columns
+"""
 
 import numpy as np
 import pickle
@@ -14,25 +18,20 @@ loaded_model = pickle.load(open("churn_model.sav", "rb"))
 
 # Prediction function
 def churn_prediction(input_data):
-    # Convert input_data to numpy array
-    input_data_as_numpy_array = np.asarray(input_data)
-
-    # Reshape for single prediction
-    input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
-
-    prediction = loaded_model.predict(input_data_reshaped)
+    input_data_as_numpy_array = np.asarray(input_data).reshape(1, -1)
+    prediction = loaded_model.predict(input_data_as_numpy_array)
 
     if prediction[0] == 0:
-        return "The customer is likely to stay (Not Churn)."
+        return "✅ The customer is likely to stay (Not Churn)."
     else:
-        return "The customer is likely to Churn."
+        return "⚠️ The customer is likely to Churn."
 
 
 def main():
     st.title("📊 Customer Churn Prediction Web App")
 
-    # Create 3 columns layout
-    col1, col2, col3 = st.columns(3)
+    # Columns with spacing (ratios: col, space, col, space, col)
+    col1, space1, col2, space2, col3 = st.columns([1, 0.2, 1, 0.2, 1])
 
     with col1:
         gender = st.selectbox("Gender", ("Female", "Male"))
@@ -67,7 +66,7 @@ def main():
 
     if st.button("🔍 Predict Churn"):
         try:
-            # NOTE: You must encode inputs the same way as training (LabelEncoder / OneHotEncoder)
+            # NOTE: Preprocessing (encoding) must match training
             input_data = [
                 gender, SeniorCitizen, Partner, Dependents, tenure,
                 PhoneService, MultipleLines, InternetService, OnlineSecurity,
@@ -75,7 +74,6 @@ def main():
                 StreamingMovies, Contract, PaperlessBilling, PaymentMethod,
                 MonthlyCharges, TotalCharges
             ]
-            # Currently raw categorical values → in real deployment, must preprocess same as training
             diagnosis = churn_prediction(input_data)
         except Exception as e:
             st.error(f"Error in prediction: {e}")
@@ -85,4 +83,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
