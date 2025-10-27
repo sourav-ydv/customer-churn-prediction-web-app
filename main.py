@@ -10,7 +10,7 @@ import pickle
 import streamlit as st
 
 # Loading the saved model
-loaded_model = pickle.load(open("C:/Users/sksou/OneDrive/Desktop/coding/ML/diabetes_model.sav", "rb"))
+loaded_model = pickle.load(open("diabetes_model.sav", "rb"))
 
 
 # creating a function
@@ -67,4 +67,5 @@ def main():
     
     
 if __name__ == '__main__':
+
     main()
