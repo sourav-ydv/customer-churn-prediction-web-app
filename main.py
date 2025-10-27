@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 27 11:10:02 2025
+Created on Mon Oct 27 12:30:00 2025
 
 @author: sksou
 """
@@ -9,63 +9,68 @@ import numpy as np
 import pickle
 import streamlit as st
 
-# Loading the saved model
-loaded_model = pickle.load(open("diabetes_model.sav", "rb"))
+# Load the saved model
+loaded_model = pickle.load(open("churn_model.sav", "rb"))
 
-
-# creating a function
-def diabetes_prediction(input_data):
-    
-    # Changing the input_data to numpy array
+# Prediction function
+def churn_prediction(input_data):
+    # Convert input_data to numpy array
     input_data_as_numpy_array = np.asarray(input_data)
 
-    # reshape the array as we are predicting for one instance
-    input_data_reshaped = input_data_as_numpy_array.reshape(1,-1)
+    # Reshape for single prediction
+    input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
 
     prediction = loaded_model.predict(input_data_reshaped)
     print(prediction)
 
-    if(prediction[0] == 0):
-        return "The person is not diabetic"
+    if prediction[0] == 0:
+        return "The customer is likely to stay (Not churn)."
     else:
-        return "The person is diabetic"
-    
-    
-    
+        return "The customer is likely to churn."
+
+
 def main():
-    # giving a title
-    st.title("Diabetes Prediction Web App")
-    
-    # getting the input data from the user
-    Pregnencies = st.text_input('Number of Pregnencies')
-    Glucose = st.text_input('Glucose Level')
-    BloodPressure = st.text_input('Blood Pressure value')
-    SkinThickness = st.text_input('Skin Thickness')
-    Insulin = st.text_input('Insulin level')
-    BMI = st.text_input('BMI value')
-    DiabetesPedigreeFunction = st.text_input('Diabetes Pedigree Function value')
-    Age = st.text_input('Age of the person')
-    
-    # Code for prediction
-    diagnosis = ''
-    
-    # Creating a button for prediction
-    if st.button('Diabetes Test Result'):
+    # Title
+    st.title("Customer Churn Prediction Web App")
+
+    # User input fields (example features from Telco dataset)
+    gender = st.selectbox("Gender", ("Male", "Female"))
+    SeniorCitizen = st.selectbox("Senior Citizen", (0, 1))
+    Partner = st.selectbox("Partner", ("Yes", "No"))
+    Dependents = st.selectbox("Dependents", ("Yes", "No"))
+    tenure = st.text_input("Tenure (in months)")
+    PhoneService = st.selectbox("Phone Service", ("Yes", "No"))
+    InternetService = st.selectbox("Internet Service", ("DSL", "Fiber optic", "No"))
+    MonthlyCharges = st.text_input("Monthly Charges")
+    TotalCharges = st.text_input("Total Charges")
+
+    # Convert categorical inputs into numerical form
+    gender_val = 1 if gender == "Male" else 0
+    Partner_val = 1 if Partner == "Yes" else 0
+    Dependents_val = 1 if Dependents == "Yes" else 0
+    PhoneService_val = 1 if PhoneService == "Yes" else 0
+    InternetService_val = 0
+    if InternetService == "DSL":
+        InternetService_val = 1
+    elif InternetService == "Fiber optic":
+        InternetService_val = 2
+
+    # Prediction result
+    diagnosis = ""
+
+    if st.button("Predict Churn"):
         try:
             input_data = [
-                float(Pregnencies), float(Glucose), float(BloodPressure),
-                float(SkinThickness), float(Insulin), float(BMI),
-                float(DiabetesPedigreeFunction), float(Age)
+                gender_val, int(SeniorCitizen), Partner_val, Dependents_val,
+                float(tenure), PhoneService_val, InternetService_val,
+                float(MonthlyCharges), float(TotalCharges)
             ]
-            diagnosis = diabetes_prediction(input_data)
+            diagnosis = churn_prediction(input_data)
         except ValueError:
-            st.error("Please enter valid numbers in all fields.")
-        
-    st.success(diagnosis)
-    
-    
-    
-    
-if __name__ == '__main__':
+            st.error("Please enter valid numbers for tenure, monthly charges, and total charges.")
 
+    st.success(diagnosis)
+
+
+if __name__ == "__main__":
     main()
