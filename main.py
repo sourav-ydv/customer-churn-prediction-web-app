@@ -26,8 +26,9 @@ def churn_prediction(input_data):
 def main():
     st.title("📊 Customer Churn Prediction Web App")
 
-    # Create 4 columns with spacing
-    col1, space1, col2, space2, col3, space3, col4 = st.columns([1, 0.2, 1, 0.2, 1, 0.2, 1])
+    # Create 4 wider columns with spacing
+    col1, space1, col2, space2, col3, space3, col4 = st.columns([1.5, 0.2, 1.5, 0.2, 1.5, 0.2, 1.5])
+
 
     # Column 1 - Personal info
     with col1:
@@ -85,3 +86,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
