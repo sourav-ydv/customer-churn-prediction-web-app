@@ -27,7 +27,7 @@ def main():
     st.title("📊 Customer Churn Prediction Web App")
 
     # Create 4 wider columns with spacing
-    col1, space1, col2, space2, col3, space3, col4 = st.columns([1.5, 0.2, 1.5, 0.2, 1.5, 0.2, 1.5])
+    col1, col2, col3, col4 = st.columns(4)
 
 
     # Column 1 - Personal info
@@ -86,4 +86,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
