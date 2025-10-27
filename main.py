@@ -30,7 +30,7 @@ st.markdown(
     """
     <style>
     .block-container {
-        max-width: 100% !important;
+        max-width: 90% !important;
         padding-left: 2rem;
         padding-right: 2rem;
     }
@@ -98,6 +98,7 @@ if st.button("🔍 Predict Churn"):
         st.error(f"Error in prediction: {e}")
 
 st.success(diagnosis)
+
 
 
 
