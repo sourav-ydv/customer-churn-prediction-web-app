@@ -6,9 +6,12 @@ Created on Mon Oct 27 12:30:00 2025
 """
 
 import numpy as np
-import pickle
 import streamlit as st
+from tensorflow.keras.models import load_model
 
+# ============================
+# Streamlit Page Settings
+# ============================
 st.set_page_config(layout="wide")
 
 st.markdown(
@@ -24,20 +27,30 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-loaded_model = pickle.load(open("churn_model.sav", "rb"))
+# ============================
+# Load ANN Model
+# ============================
+ann = load_model("churn_ann_model.h5")
+best_threshold = 0.55   # from threshold tuning
 
+# ============================
+# Prediction Function
+# ============================
 def churn_prediction(input_data):
     input_data_as_numpy_array = np.asarray(input_data).reshape(1, -1)
-    prediction = loaded_model.predict(input_data_as_numpy_array)
+    prob = ann.predict(input_data_as_numpy_array)[0][0]
 
-    if prediction[0] == 0:
-        return "✅ The customer is likely to stay (Not Churn)."
+    if prob > best_threshold:
+        return f"⚠️ The customer is likely to Churn. (Prob = {prob:.2f})"
     else:
-        return "⚠️ The customer is likely to Churn."
+        return f"✅ The customer is likely to Stay (Not Churn). (Prob = {prob:.2f})"
 
 
+# ============================
+# Main App
+# ============================
 def main():
-    st.title("📊 Customer Churn Prediction")
+    st.title("📊 Customer Churn Prediction (ANN Model)")
 
     col1, space, col2 = st.columns([1.5, 0.2, 1.5])
 
@@ -51,7 +64,7 @@ def main():
         tenure = st.number_input("Tenure (in months)", min_value=0, max_value=100, step=1)
         MonthlyCharges = st.number_input("Monthly Charges", min_value=0.0, step=0.1)
         TotalCharges = st.number_input("Total Charges", min_value=0.0, step=0.1)
-        
+
         PaperlessBilling = st.selectbox(
             "Paperless Billing",
             ["Yes", "No"],
@@ -94,6 +107,7 @@ def main():
             st.error("⚠️ Please select a value for all dropdowns before prediction.")
         else:
             try:
+                # Encoding mappings
                 contract_map = {"Month-to-month": 0, "One year": 1, "Two year": 2}
                 paperless_map = {"No": 0, "Yes": 1}
                 payment_map = {
@@ -105,18 +119,20 @@ def main():
                 internet_map = {"No": 0, "DSL": 1, "Fiber optic": 2}
                 service_map = {"No": 0, "Yes": 1, "No internet service": 2}
 
+                # Defaults for unused features
                 defaults = {
-                    "gender": 0,           
+                    "gender": 0,
                     "SeniorCitizen": 0,
-                    "Partner": 0,           
-                    "Dependents": 0,       
-                    "PhoneService": 1,     
-                    "MultipleLines": 1,      
-                    "DeviceProtection": 0,  
-                    "StreamingTV": 0,        
-                    "StreamingMovies": 0      
+                    "Partner": 0,
+                    "Dependents": 0,
+                    "PhoneService": 1,
+                    "MultipleLines": 1,
+                    "DeviceProtection": 0,
+                    "StreamingTV": 0,
+                    "StreamingMovies": 0
                 }
 
+                # Final Input Vector (must match training preprocessing order)
                 input_data = [
                     defaults["gender"],
                     defaults["SeniorCitizen"],
@@ -127,7 +143,7 @@ def main():
                     defaults["MultipleLines"],
                     internet_map[InternetService],
                     service_map[OnlineSecurity],
-                    service_map["No"],  
+                    service_map["No"],  # OnlineBackup default
                     defaults["DeviceProtection"],
                     service_map[TechSupport],
                     defaults["StreamingTV"],
@@ -139,6 +155,7 @@ def main():
                     TotalCharges
                 ]
 
+                # Prediction
                 diagnosis = churn_prediction(input_data)
                 st.success(diagnosis)
 
@@ -148,8 +165,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
 
 
 
