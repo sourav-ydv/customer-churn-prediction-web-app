@@ -9,10 +9,8 @@ import numpy as np
 import pickle
 import streamlit as st
 
-# Set wide mode
 st.set_page_config(layout="wide")
 
-# Custom CSS to stretch full width
 st.markdown(
     """
     <style>
@@ -26,10 +24,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Load the saved churn model
 loaded_model = pickle.load(open("churn_model.sav", "rb"))
 
-# Prediction function
 def churn_prediction(input_data):
     input_data_as_numpy_array = np.asarray(input_data).reshape(1, -1)
     prediction = loaded_model.predict(input_data_as_numpy_array)
@@ -43,7 +39,6 @@ def churn_prediction(input_data):
 def main():
     st.title("📊 Customer Churn Prediction (Simplified Features)")
 
-    # Two columns layout for inputs
     col1, space, col2 = st.columns([1.5, 0.2, 1.5])
 
     with col1:
@@ -56,14 +51,15 @@ def main():
         tenure = st.number_input("Tenure (in months)", min_value=0, max_value=100, step=1)
         MonthlyCharges = st.number_input("Monthly Charges", min_value=0.0, step=0.1)
         TotalCharges = st.number_input("Total Charges", min_value=0.0, step=0.1)
-
-    with col2:
+        
         PaperlessBilling = st.selectbox(
             "Paperless Billing",
             ["Yes", "No"],
             index=None,
             placeholder="Choose Option"
         )
+
+    with col2:
         PaymentMethod = st.selectbox(
             "Payment Method",
             ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"],
@@ -89,17 +85,15 @@ def main():
             placeholder="Choose Option"
         )
 
-    # Prediction result
     diagnosis = ""
 
-    if st.button("🔍 Predict Churn"):
+    if st.button("Predict Churn"):
         dropdowns = [Contract, PaperlessBilling, PaymentMethod, InternetService, OnlineSecurity, TechSupport]
 
         if any(option is None for option in dropdowns):
             st.error("⚠️ Please select a value for all dropdowns before prediction.")
         else:
             try:
-                # === Encoding mappings ===
                 contract_map = {"Month-to-month": 0, "One year": 1, "Two year": 2}
                 paperless_map = {"No": 0, "Yes": 1}
                 payment_map = {
@@ -111,20 +105,18 @@ def main():
                 internet_map = {"No": 0, "DSL": 1, "Fiber optic": 2}
                 service_map = {"No": 0, "Yes": 1, "No internet service": 2}
 
-                # === Defaults for less important features ===
                 defaults = {
-                    "gender": 0,               # Female
+                    "gender": 0,           
                     "SeniorCitizen": 0,
-                    "Partner": 0,              # No
-                    "Dependents": 0,           # No
-                    "PhoneService": 1,         # Yes
-                    "MultipleLines": 1,        # No
-                    "DeviceProtection": 0,     # No
-                    "StreamingTV": 0,          # No
-                    "StreamingMovies": 0       # No
+                    "Partner": 0,           
+                    "Dependents": 0,       
+                    "PhoneService": 1,     
+                    "MultipleLines": 1,      
+                    "DeviceProtection": 0,  
+                    "StreamingTV": 0,        
+                    "StreamingMovies": 0      
                 }
 
-                # === Build full 19-feature input ===
                 input_data = [
                     defaults["gender"],
                     defaults["SeniorCitizen"],
@@ -135,7 +127,7 @@ def main():
                     defaults["MultipleLines"],
                     internet_map[InternetService],
                     service_map[OnlineSecurity],
-                    service_map["No"],  # OnlineBackup default = "No"
+                    service_map["No"],  
                     defaults["DeviceProtection"],
                     service_map[TechSupport],
                     defaults["StreamingTV"],
@@ -156,6 +148,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
