@@ -17,7 +17,7 @@ st.markdown(
     """
     <style>
     .block-container {
-        max-width: 100% !important;
+        max-width: 70% !important;
         padding-left: 2rem;
         padding-right: 2rem;
     }
@@ -133,6 +133,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
