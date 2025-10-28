@@ -30,7 +30,11 @@ st.markdown(
 # ============================
 # Load ANN Model
 # ============================
-ann = load_model("churn_ann_model.h5")
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import LeakyReLU
+
+# Load ANN model with custom layer
+ann = load_model("churn_ann_model.h5", custom_objects={"LeakyReLU": LeakyReLU})
 best_threshold = 0.55   # from threshold tuning
 
 # ============================
@@ -165,6 +169,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
