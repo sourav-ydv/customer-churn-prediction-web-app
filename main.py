@@ -41,9 +41,9 @@ def churn_prediction(input_data):
 
 
 def main():
-    st.title("📊 Customer Churn Prediction")
+    st.title("📊 Customer Churn Prediction (Simplified Features)")
 
-    # Two columns layout
+    # Two columns layout for inputs
     col1, space, col2 = st.columns([1.5, 0.2, 1.5])
 
     with col1:
@@ -56,14 +56,14 @@ def main():
         tenure = st.number_input("Tenure (in months)", min_value=0, max_value=100, step=1)
         MonthlyCharges = st.number_input("Monthly Charges", min_value=0.0, step=0.1)
         TotalCharges = st.number_input("Total Charges", min_value=0.0, step=0.1)
+
+    with col2:
         PaperlessBilling = st.selectbox(
             "Paperless Billing",
             ["Yes", "No"],
             index=None,
             placeholder="Choose Option"
         )
-
-    with col2:
         PaymentMethod = st.selectbox(
             "Payment Method",
             ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"],
@@ -99,7 +99,7 @@ def main():
             st.error("⚠️ Please select a value for all dropdowns before prediction.")
         else:
             try:
-                # Encoding mappings
+                # === Encoding mappings ===
                 contract_map = {"Month-to-month": 0, "One year": 1, "Two year": 2}
                 paperless_map = {"No": 0, "Yes": 1}
                 payment_map = {
@@ -111,17 +111,40 @@ def main():
                 internet_map = {"No": 0, "DSL": 1, "Fiber optic": 2}
                 service_map = {"No": 0, "Yes": 1, "No internet service": 2}
 
-                # Apply encoding
+                # === Defaults for less important features ===
+                defaults = {
+                    "gender": 0,               # Female
+                    "SeniorCitizen": 0,
+                    "Partner": 0,              # No
+                    "Dependents": 0,           # No
+                    "PhoneService": 1,         # Yes
+                    "MultipleLines": 1,        # No
+                    "DeviceProtection": 0,     # No
+                    "StreamingTV": 0,          # No
+                    "StreamingMovies": 0       # No
+                }
+
+                # === Build full 19-feature input ===
                 input_data = [
-                    contract_map[Contract],
+                    defaults["gender"],
+                    defaults["SeniorCitizen"],
+                    defaults["Partner"],
+                    defaults["Dependents"],
                     tenure,
-                    MonthlyCharges,
-                    TotalCharges,
-                    paperless_map[PaperlessBilling],
-                    payment_map[PaymentMethod],
+                    defaults["PhoneService"],
+                    defaults["MultipleLines"],
                     internet_map[InternetService],
                     service_map[OnlineSecurity],
-                    service_map[TechSupport]
+                    service_map["No"],  # OnlineBackup default = "No"
+                    defaults["DeviceProtection"],
+                    service_map[TechSupport],
+                    defaults["StreamingTV"],
+                    defaults["StreamingMovies"],
+                    contract_map[Contract],
+                    paperless_map[PaperlessBilling],
+                    payment_map[PaymentMethod],
+                    MonthlyCharges,
+                    TotalCharges
                 ]
 
                 diagnosis = churn_prediction(input_data)
@@ -133,7 +156,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 
