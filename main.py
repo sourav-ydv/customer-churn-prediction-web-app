@@ -56,14 +56,14 @@ def main():
         tenure = st.number_input("Tenure (in months)", min_value=0, max_value=100, step=1)
         MonthlyCharges = st.number_input("Monthly Charges", min_value=0.0, step=0.1)
         TotalCharges = st.number_input("Total Charges", min_value=0.0, step=0.1)
-
-    with col2:
         PaperlessBilling = st.selectbox(
             "Paperless Billing",
             ["Yes", "No"],
             index=None,
             placeholder="Choose Option"
         )
+
+    with col2:
         PaymentMethod = st.selectbox(
             "Payment Method",
             ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"],
@@ -133,6 +133,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
