@@ -69,8 +69,8 @@ def main():
             index=None,
             placeholder="Choose Payment Method"
         )
-        MonthlyCharges = st.number_input("Monthly Charges", min_value=0.0, step=0.1)
-        TotalCharges = st.number_input("Total Charges", min_value=0.0, step=0.1)
+        MonthlyCharges = st.number_input("Monthly Charges")
+        TotalCharges = st.number_input("Total Charges")
 
     diagnosis = ""
 
@@ -132,5 +132,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
