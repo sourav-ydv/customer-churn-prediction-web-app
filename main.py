@@ -41,7 +41,7 @@ def churn_prediction(input_data):
 
 
 def main():
-    st.title("📊 Customer Churn Prediction (Simplified Features)")
+    st.title("📊 Customer Churn Prediction")
 
     # Two columns layout
     col1, space, col2 = st.columns([1.5, 0.2, 1.5])
@@ -133,6 +133,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
