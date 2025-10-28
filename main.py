@@ -69,8 +69,8 @@ def main():
             index=None,
             placeholder="Choose Payment Method"
         )
-        MonthlyCharges = st.number_input("Monthly Charges")
-        TotalCharges = st.number_input("Total Charges")
+        MonthlyCharges = st.text_input("Monthly Charges")
+        TotalCharges = st.text_input("Total Charges")
 
     diagnosis = ""
 
@@ -119,8 +119,8 @@ def main():
                     contract_map[Contract],
                     paperless_map[PaperlessBilling],
                     payment_map[PaymentMethod],
-                    MonthlyCharges,
-                    TotalCharges
+                    float(MonthlyCharges),
+                    float(TotalCharges)
                 ]
 
                 diagnosis = churn_prediction(input_data)
@@ -132,6 +132,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
