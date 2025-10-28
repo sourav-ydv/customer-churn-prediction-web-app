@@ -38,7 +38,7 @@ def churn_prediction(input_data):
 def main():
     st.title("📊 Customer Churn Prediction Web App")
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, space1, col2, space2, col3, space3, col4 = st.columns([1.5, 0.2, 1.5, 0.2, 1.5, 0.2, 1.5])
 
     with col1:
         gender = st.selectbox("Gender", ["Female", "Male"], index=None, placeholder="Choose Gender")
@@ -132,4 +132,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
