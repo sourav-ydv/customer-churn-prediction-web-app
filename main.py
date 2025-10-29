@@ -7,7 +7,11 @@ Created on Mon Oct 27 12:30:00 2025
 
 import numpy as np
 import pickle
+import pandas as pd
 import streamlit as st
+from tensorflow import keras
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import LeakyReLU
 
 st.set_page_config(layout="wide")
 
@@ -24,126 +28,83 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-loaded_model = pickle.load(open("churn_model.sav", "rb"))
+@st.cache_resource
+def load_ann():
+    return keras.models.load_model("churn_ann_model.keras")
 
-def churn_prediction(input_data):
-    input_data_as_numpy_array = np.asarray(input_data).reshape(1, -1)
-    prediction = loaded_model.predict(input_data_as_numpy_array)
+ann = load_ann()
+with open("preprocessor.pkl", "rb") as f:
+    preprocessor = pickle.load(f)
 
-    if prediction[0] == 0:
-        return "✅ The customer is likely to stay (Not Churn)."
+best_threshold = 0.55
+
+def churn_prediction(input_dict):
+    df_input = pd.DataFrame([input_dict])  
+
+    input_processed = preprocessor.transform(df_input)
+
+    prob = ann.predict(input_processed)[0][0]
+
+    if prob > best_threshold:
+        return f"The customer is likely to Churn"
     else:
-        return "⚠️ The customer is likely to Churn."
+        return f"The customer is likely to Stay"
+
+st.set_page_config(layout="wide")
+st.title("📊 Customer Churn Prediction")
+
+col1, space, col2 = st.columns([1.5, 0.2, 1.5])
+
+with col1:
+    Contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"], index=None)
+    tenure = st.number_input("Tenure (months)", min_value=0, max_value=100, step=1)
+    MonthlyCharges = st.number_input("Monthly Charges", min_value=0.0, step=0.1)
+    TotalCharges = st.number_input("Total Charges", min_value=0.0, step=0.1)
+    PaperlessBilling = st.selectbox("Paperless Billing", ["Yes", "No"], index=None)
+
+with col2:
+    PaymentMethod = st.selectbox("Payment Method", 
+                                 ["Electronic check", "Mailed check", 
+                                  "Bank transfer (automatic)", "Credit card (automatic)"], index=None)
+    InternetService = st.selectbox("Internet Service", ["DSL", "Fiber optic", "No"], index=None)
+    OnlineSecurity = st.selectbox("Online Security", ["No", "Yes", "No internet service"], index=None)
+    TechSupport = st.selectbox("Tech Support", ["No", "Yes", "No internet service"], index=None)
+
+diagnosis = ""
+
+if st.button("Predict Churn"):
+    dropdowns = [Contract, PaperlessBilling, PaymentMethod, InternetService, OnlineSecurity, TechSupport]
+
+    if any(option is None for option in dropdowns):
+        st.error("Please fill all fields before prediction.")
+    else:
+        try:
+            input_dict = {
+                "gender": "Female",          
+                "SeniorCitizen": 0,
+                "Partner": "No",
+                "Dependents": "No",
+                "tenure": tenure,
+                "PhoneService": "Yes",
+                "MultipleLines": "No",
+                "InternetService": InternetService,
+                "OnlineSecurity": OnlineSecurity,
+                "OnlineBackup": "No",   
+                "DeviceProtection": "No",   
+                "TechSupport": TechSupport,
+                "StreamingTV": "No",          
+                "StreamingMovies": "No",    
+                "Contract": Contract,
+                "PaperlessBilling": PaperlessBilling,
+                "PaymentMethod": PaymentMethod,
+                "MonthlyCharges": MonthlyCharges,
+                "TotalCharges": TotalCharges
+            }
+
+            diagnosis = churn_prediction(input_dict)
+            st.success(diagnosis)
+
+        except Exception as e:
+            st.error(f"Error in prediction: {e}")
 
 
-def main():
-    st.title("📊 Customer Churn Prediction")
-
-    col1, space, col2 = st.columns([1.5, 0.2, 1.5])
-
-    with col1:
-        Contract = st.selectbox(
-            "Contract",
-            ["Month-to-month", "One year", "Two year"],
-            index=None,
-            placeholder="Choose Contract"
-        )
-        tenure = st.number_input("Tenure (in months)", min_value=0, max_value=100, step=1)
-        MonthlyCharges = st.number_input("Monthly Charges", min_value=0.0, step=0.1)
-        TotalCharges = st.number_input("Total Charges", min_value=0.0, step=0.1)
-        PaperlessBilling = st.selectbox(
-            "Paperless Billing",
-            ["Yes", "No"],
-            index=None,
-            placeholder="Choose Option"
-        )
-
-    with col2:
-        PaymentMethod = st.selectbox(
-            "Payment Method",
-            ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"],
-            index=None,
-            placeholder="Choose Payment Method"
-        )
-        InternetService = st.selectbox(
-            "Internet Service",
-            ["DSL", "Fiber optic", "No"],
-            index=None,
-            placeholder="Choose Internet Service"
-        )
-        OnlineSecurity = st.selectbox(
-            "Online Security",
-            ["No", "Yes", "No internet service"],
-            index=None,
-            placeholder="Choose Option"
-        )
-        TechSupport = st.selectbox(
-            "Tech Support",
-            ["No", "Yes", "No internet service"],
-            index=None,
-            placeholder="Choose Option"
-        )
-
-    diagnosis = ""
-
-    if st.button("Predict Churn"):
-        dropdowns = [Contract, PaperlessBilling, PaymentMethod, InternetService, OnlineSecurity, TechSupport]
-
-        if any(option is None for option in dropdowns):
-            st.error("⚠️ Please select a value for all dropdowns before prediction.")
-        else:
-            try:
-                contract_map = {"Month-to-month": 0, "One year": 1, "Two year": 2}
-                paperless_map = {"No": 0, "Yes": 1}
-                payment_map = {
-                    "Electronic check": 0,
-                    "Mailed check": 1,
-                    "Bank transfer (automatic)": 2,
-                    "Credit card (automatic)": 3
-                }
-                internet_map = {"No": 0, "DSL": 1, "Fiber optic": 2}
-                service_map = {"No": 0, "Yes": 1, "No internet service": 2}
-
-                defaults = {
-                    "gender": 0,              
-                    "SeniorCitizen": 0,
-                    "Partner": 0,              
-                    "Dependents": 0,          
-                    "PhoneService": 1,         
-                    "MultipleLines": 1,       
-                    "DeviceProtection": 0,    
-                    "StreamingTV": 0,         
-                    "StreamingMovies": 0      
-                }
-                
-                input_data = [
-                    defaults["gender"],
-                    defaults["SeniorCitizen"],
-                    defaults["Partner"],
-                    defaults["Dependents"],
-                    tenure,
-                    defaults["PhoneService"],
-                    defaults["MultipleLines"],
-                    internet_map[InternetService],
-                    service_map[OnlineSecurity],
-                    service_map["No"],  
-                    defaults["DeviceProtection"],
-                    service_map[TechSupport],
-                    defaults["StreamingTV"],
-                    defaults["StreamingMovies"],
-                    contract_map[Contract],
-                    paperless_map[PaperlessBilling],
-                    payment_map[PaymentMethod],
-                    MonthlyCharges,
-                    TotalCharges
-                ]
-
-                diagnosis = churn_prediction(input_data)
-                st.success(diagnosis)
-
-            except Exception as e:
-                st.error(f"Error in prediction: {e}")
-
-
-if __name__ == "__main__":
-    main()
